@@ -1,33 +1,45 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include "matplotlibcpp.h"
+#include <vector>
+#include <fstream>
+#include <sstream>
 
+#include <string>
 using namespace std;
 namespace plt = matplotlibcpp;
 
 int main() 
 {
-	// plot(y) - the x-coordinates are implicitly set to [0,1,...,n)
-	//plt::plot({1,2,3,4}); 
-	
-	// Prepare data for parametric plot.
-	int n = 5000; // number of data points
-	vector<double> x(n),y(n); 
-	for(int i=0; i<n; ++i) {
-		double t = 2*M_PI*i/n;
-		x.at(i) = 16*sin(t)*sin(t)*sin(t);
-		y.at(i) = 13*cos(t) - 5*cos(2*t) - 2*cos(3*t) - cos(4*t);
-	}
+    vector<vector<int>> sensor_data;
+    const char *inputfile = "../sensor_data_200.txt";
+    std::ifstream ifs(inputfile);
+    if( !ifs ) {
+        std::cout << "cannot read file" << std::endl;
+    }
 
-	// plot() takes an arbitrary number of (x,y,format)-triples. 
-	// x must be iterable (that is, anything providing begin(x) and end(x)),
-	// y must either be callable (providing operator() const) or iterable. 
-	plt::plot(x, y, "r-", x, [](double d) { return 12.5+abs(sin(d)); }, "k-");
+    string line;
+    for( int row = 0; getline(ifs, line); row++ ) {
+        istringstream stream(line);
+        int data;
+        vector<int> n_data;
+        for( int col = 0; stream >> data; col++ ) {
+            n_data.emplace_back(data);
+        }
+        sensor_data.emplace_back(n_data);
+    }
 
-	//plt::set_aspect(0.5);
-	plt::set_aspect_equal();
+    std::vector<int> lidar_data;
+    for( int i = 0; i < sensor_data.size(); i++ ) {
+        lidar_data.emplace_back(sensor_data[i][3]);
+    }
+    int max = *max_element(lidar_data.begin(), lidar_data.end());
+    int min = *min_element(lidar_data.begin(), lidar_data.end());
+    plt::hist(lidar_data,max-min);
+    plt::title("Lidar Sensor");
+    plt::xlabel("sensor values");
+    plt::ylabel("frequency");
+    plt::show();
 
-
-	// show plots
-	plt::show();
+    return (0);
 }
