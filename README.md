@@ -4,7 +4,7 @@
 
 C++に変える理由は、pythonコードだとどうしてもコピペになってしまうのでC++に書き換えてより理解を深める.
 
-C++のグラフ描画は、[matplotlib-cpp](https://github.com/lava/matplotlib-cpp)
+グラフ描画は、[matplotlib-cpp](https://github.com/lava/matplotlib-cpp)
 シミュレーション描画は、[OpenSiv3D](https://github.com/Siv3D/OpenSiv3D)
 を使用する.
 
